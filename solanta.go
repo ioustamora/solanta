@@ -2,10 +2,10 @@ package main
 
 import (
 	"context"
+	"fmt"
+	"log"
 	"os"
 	"os/signal"
-	"log"
-	"fmt"
 
 	"github.com/go-telegram/bot"
 	"github.com/go-telegram/bot/models"
@@ -31,7 +31,7 @@ func main() {
 
 	b.RegisterHandler(bot.HandlerTypeMessageText, "/hello", bot.MatchTypeExact, helloHandler)
 	b.RegisterHandler(bot.HandlerTypeMessageText, "/wallet", bot.MatchTypeExact, walletHandler)
-	
+
 	b.Start(ctx)
 }
 
@@ -65,44 +65,44 @@ func handler(ctx context.Context, b *bot.Bot, update *models.Update) {
 }
 
 func walletHandler(ctx context.Context, b *bot.Bot, update *models.Update) {
-    if update.Message != nil {
-        chatID := update.Message.Chat.ID
+	if update.Message != nil {
+		chatID := update.Message.Chat.ID
 
-        // Create a new Solana wallet
-        wallet := types.NewAccount()
+		// Create a new Solana wallet
+		wallet := types.NewAccount()
 
-        // Airdrop 1 SOL to the new wallet
-        c := client.NewClient("https://api.devnet.solana.com")
-        _, err := c.RequestAirdrop(ctx, wallet.PublicKey.ToBase58(), 1e9) // 1 SOL = 1e9 lamports
-        if err != nil {
-            b.SendMessage(ctx, &bot.SendMessageParams{
-                ChatID: chatID,
-                Text:   "Failed to airdrop 1 SOL: " + err.Error(),
-            })
-            return
-        }
+		// Airdrop 1 SOL to the new wallet
+		c := client.NewClient("https://api.devnet.solana.com")
+		_, err := c.RequestAirdrop(ctx, wallet.PublicKey.ToBase58(), 1e9) // 1 SOL = 1e9 lamports
+		if err != nil {
+			b.SendMessage(ctx, &bot.SendMessageParams{
+				ChatID: chatID,
+				Text:   "Failed to airdrop 1 SOL: " + err.Error(),
+			})
+			return
+		}
 
-        // Get wallet balance
-        balance, err := c.GetBalance(ctx, wallet.PublicKey.ToBase58())
-        if err != nil {
-            b.SendMessage(ctx, &bot.SendMessageParams{
-                ChatID: chatID,
-                Text:   "Failed to get wallet balance: " + err.Error(),
-            })
-            return
-        }
+		// Get wallet balance
+		balance, err := c.GetBalance(ctx, wallet.PublicKey.ToBase58())
+		if err != nil {
+			b.SendMessage(ctx, &bot.SendMessageParams{
+				ChatID: chatID,
+				Text:   "Failed to get wallet balance: " + err.Error(),
+			})
+			return
+		}
 
-        // Send wallet details to the user
-        message := fmt.Sprintf(
-            "Wallet Address(Public Key): %s\nPrivate Key: %x\nBalance: %f SOL",
-            wallet.PublicKey.ToBase58(),
-            wallet.PrivateKey,
-            float64(balance)/1e9,
-        )
+		// Send wallet details to the user
+		message := fmt.Sprintf(
+			"Wallet Address(Public Key): %s\nPrivate Key: %x\nBalance: %f SOL",
+			wallet.PublicKey.ToBase58(),
+			wallet.PrivateKey,
+			float64(balance)/1e9,
+		)
 
-        b.SendMessage(ctx, &bot.SendMessageParams{
-            ChatID: chatID,
-            Text:   message,
-        })
-    }
+		b.SendMessage(ctx, &bot.SendMessageParams{
+			ChatID: chatID,
+			Text:   message,
+		})
+	}
 }

@@ -6,7 +6,11 @@ edition = "2021"
 [dependencies]
 solana-client = "2.0.9"
 solana-sdk = "2.0.9"
-teloxide = { version = "0.13.0", features = ["full"] }
+teloxide = { version = "0.13.0", features = ["macros"] }
 tokio = { version = "1.40.0", features = ["full"] }
 log = "0.4.22"
 pretty_env_logger = "0.5.0"
+mnemonic = "1.1.1"
+rand = "0.8.5"
+serde = { version = "1.0.210", features = ["derive"] }
+rusqlite = { version = "0.32.1", features = ["bundled"]}
